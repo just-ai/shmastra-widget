@@ -102,17 +102,18 @@ function AssistantChat({threadData, setThreadData}: {
     threadData: ThreadData;
     setThreadData: (data: ThreadData) => void;
 }) {
-    const env = window as unknown as Record<string, unknown>
     const {modelId} = useModel();
     const [modalOpen, setModalOpen] = useState(false);
     const runtime = useChatRuntime({
         messages: threadData.messages,
         transport: new AssistantChatTransport({
             api: getChatUrl(),
-            body: {modelId, threadId: threadData.threadId},
-            headers: env.MASTRA_SERVER_HOST ? {
-                "x-mastra-path": window.location.pathname
-            } : {}
+            body: {
+                modelId,
+                threadId: threadData.threadId,
+                path: window.location.pathname,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
         }),
         adapters: {
             attachments: fileAttachmentAdapter,

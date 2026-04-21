@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => {
       ...(isWidget ? [cssInjectedByJsPlugin({
         styleId: 'assistant-widget-styles',
         injectCodeFunction: function(cssCode: string) {
-          (window as any).__assistantWidgetCSS = ((window as any).__assistantWidgetCSS || '') + cssCode;
+          const w = globalThis as unknown as { __assistantWidgetCSS?: string };
+          w.__assistantWidgetCSS = (w.__assistantWidgetCSS || '') + cssCode;
         }
       })] : []),
     ],
