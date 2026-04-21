@@ -1,8 +1,10 @@
 # Shmastra Widget
 
-Chat widget for the [Shmastra](https://github.com/just-ai/shmastra) coding agent. 
-Built as a standalone IIFE bundle and embedded into [Mastra Studio](https://mastra.ai/) via Shadow DOM. 
-This keeps Shmastra from becoming a monorepo and preserves compatibility with the Mastra template format.
+Chat widget for the [Shmastra](https://github.com/just-ai/shmastra) coding agent. Lives in a separate repo so Shmastra stays a valid [Mastra template](https://mastra.ai/) — installable via `npx create-mastra@latest --template` without becoming a monorepo.
+
+Built as a standalone IIFE bundle and embedded into Mastra Studio via Shadow DOM.
+
+[Read the docs →](https://just-ai.github.io/shmastra-docs/shmastra/the-chat-widget.html)
 
 ## Building
 
@@ -69,22 +71,9 @@ body {
 }
 ```
 
-## Architecture
-
-- **Shadow DOM** — the widget mounts into a Shadow Root. All styles (Tailwind CSS v4, shadcn/ui) are encapsulated and won't conflict with the host page.
-- **IIFE bundle** — `vite build --mode widget` bundles everything (React, React DOM, libraries) into a single `assistant-widget.iife.js`. CSS is inlined via `vite-plugin-css-injected-by-js`.
-- **API** — the widget communicates with the Shmastra server over REST:
-  - `GET /shmastra/api/thread` — create or retrieve a thread
-  - `POST /shmastra/api/chat` — stream responses (AI SDK compatible)
-  - `POST /shmastra/api/answer` — user response to `ask_user`
-  - `POST /shmastra/api/vars` — submit environment variables
-  - `GET/POST /shmastra/api/connection/:toolkit` — OAuth toolkit connection
-  - `POST /shmastra/api/files` — file attachment upload
-  - `GET /health` — server availability check
-
 ## Features
 
-- Streaming assistant responses with Markdown rendering (GFM, code highlighting)
+- Streaming responses with Markdown rendering (GFM, code highlighting)
 - Model selector with provider grouping and recent history
 - Resizable panel via left-edge drag handle
 - Voice input (Web Speech API)
@@ -92,64 +81,7 @@ body {
 - Browser notifications on response completion or action requests
 - Session reset (new thread)
 - Automatic server restart detection with UI blocking until ready
-
-## Tool UI
-
-The widget includes specialized UI components for agent tool calls:
-
-### Interactive (require user action)
-
-| Tool | Description |
-|------|-------------|
-| `ask_user` | Question card from the agent. Shows predefined options as buttons or a free-text input field. |
-| `ask_env_vars_safely` | Form for entering environment variables (with password fields for secrets). |
-| `connect_toolkit` | Authorization button for external toolkits via OAuth popup, with logo and connection status. |
-
-### File operations
-
-| Tool | Description |
-|------|-------------|
-| `view` | Collapsible block with file contents rendered as Markdown. |
-| `write_file` | Shows the file path and content being written. |
-| `string_replace_lsp` | Diff view: old text (red) and new text (green). |
-| `delete_file` | Row with trash icon and target file path. |
-| `find_files` | File search — shows pattern, match count, and list of found files. |
-| `search_content` | Grep-style content search — pattern, match count, and results. |
-| `apply_changes` | Three-phase indicator: applying changes, server restart, done. |
-
-### Tasks and skills
-
-| Tool | Description |
-|------|-------------|
-| `task_write` | Current active task with progress counter (completed/total). |
-| `task_check` | Task status summary with list and status icons. |
-| `skill` | Skill learning indicator: "Learning..." / "Learned [name]". |
-| `skill_read` | Skill file reading indicator. |
-
-### Commands and integrations
-
-| Tool | Description |
-|------|-------------|
-| `execute_command` | Terminal command — shows command and stdout/stderr in a monospace block. |
-| `execute_toolkit_tool` | Minimal inline status for toolkit tool execution. |
-| `search_toolkits` | Shimmer indicator while searching toolkits. |
-| `search_mcp_servers` | Shimmer indicator while searching MCP servers. |
-| `subagent` | Sub-agent card: type, task, execution time, model, and Markdown response. |
-
-### Hidden
-
-`get_toolkit_tool_schema` and `recall` are registered but not displayed in the UI.
-
-Unrecognized tool calls use a fallback component with a JSON tree of arguments and result.
-
-## Tech stack
-
-- React 19, TypeScript, Vite 7
-- [assistant-ui](https://github.com/assistant-ui/assistant-ui) — chat interface primitives
-- [AI SDK](https://sdk.vercel.ai/) — streaming transport
-- Tailwind CSS v4, shadcn/ui (new-york)
-- Zustand — state management
-- Shadow DOM — style isolation
+- Specialized UI for agent tool calls (file diffs, OAuth prompts, env var forms, sub-agent cards)
 
 ## Development
 
