@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
           build: {
             lib: {
               entry: path.resolve(__dirname, "src/widget.tsx"),
-              name: "ShmastraWidget",
+              name: "AssistantWidget",
               fileName: "assistant-widget",
               formats: ["iife"],
             },

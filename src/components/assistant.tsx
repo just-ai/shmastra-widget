@@ -5,7 +5,7 @@ import {useEffect, useRef, useState} from "react";
 const INTERACTIVE_TOOLS = ["ask_user", "connect_toolkit"];
 
 function notify(body: string, tag: string) {
-    if (Notification.permission !== "granted" || !document.hidden) return;
+    if (Notification.permission !== "granted" || document.hasFocus()) return;
     const n = new Notification("Shmastra", {body, tag});
     n.onclick = () => { window.focus(); n.close(); };
 }

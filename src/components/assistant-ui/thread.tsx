@@ -106,7 +106,7 @@ const ThreadWelcome: FC = () => {
             Suggestion: ThreadSuggestionItem,
           }}
         />
-        <a href="https://github.com/just-ai/shmastra" target="_blank"
+        <a href="https://just-ai.github.io/shmastra-docs/shmastra/features/" target="_blank"
            className="text-sm font-light tracking-wide text-muted-foreground/70 underline decoration-dotted underline-offset-4 decoration-muted-foreground/30 transition-colors hover:text-foreground hover:decoration-foreground/40"
         >
           Learn more
