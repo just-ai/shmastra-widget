@@ -1,17 +1,20 @@
-import { makeAssistantToolUI, useAuiState } from "@assistant-ui/react";
+import { makeAssistantToolUI, useAui, useAuiState } from "@assistant-ui/react";
 import { useServerStatus } from "@/lib/server-status-context.tsx";
 import { useTasks } from "@/lib/task-context.ts";
 import { useEffect, useRef } from "react";
 import { CheckIcon, CircleIcon, XIcon } from "lucide-react";
 
-type ApplyChangesArgs = Record<string, never>;
+type ApplyChangesArgs = { notify?: boolean };
 type ApplyChangesResult = { success: true } | { success: false; error: string };
 
-function ApplyChangesRender({ result }: { result?: ApplyChangesResult }) {
+function ApplyChangesRender({ args, result }: { args: ApplyChangesArgs; result?: ApplyChangesResult }) {
+    const aui = useAui();
     const { waitForServer, restarting } = useServerStatus();
     const isRunning = useAuiState((s) => s.thread.isRunning);
     const { tasks } = useTasks();
     const triggered = useRef(false);
+    const notified = useRef(false);
+    const wasRestarting = useRef(false);
     // Track if we saw this tool call arrive during a live stream
     const wasLive = useRef(false);
     // If there's an in_progress task, task-write already shows status — suppress our deploying UI
@@ -29,6 +32,25 @@ function ApplyChangesRender({ result }: { result?: ApplyChangesResult }) {
             waitForServer();
         }
     }, [result, isRunning, waitForServer]);
+
+    useEffect(() => {
+        if (restarting) {
+            wasRestarting.current = true;
+            return;
+        }
+        if (
+            wasRestarting.current &&
+            triggered.current &&
+            !notified.current &&
+            args?.notify &&
+            result &&
+            "success" in result &&
+            result.success
+        ) {
+            notified.current = true;
+            aui.thread().append("<continue/>");
+        }
+    }, [restarting, args?.notify, result, aui]);
 
     // Determine visual phase
     const isError = result && !result.success;

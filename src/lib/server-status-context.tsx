@@ -16,7 +16,7 @@ export function useServerStatus() {
 }
 
 const POLL_INTERVAL = 1500;
-const APPLY_DELAY = 7000;
+const APPLY_DELAY = 10_000;
 
 /**
  * Creates a full-screen overlay on document.body to block all mouse interaction

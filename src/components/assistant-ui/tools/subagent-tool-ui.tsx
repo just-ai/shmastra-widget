@@ -12,7 +12,8 @@ type SubagentResult = {
     isError: boolean;
 };
 
-function parseSubagentMeta(content: string) {
+function parseSubagentMeta(content: string | undefined | null) {
+    if (typeof content !== "string") return { text: "", meta: null };
     const metaMatch = content.match(/<subagent-meta\s+([^>]*)>/);
     if (!metaMatch) return { text: content, meta: null };
 

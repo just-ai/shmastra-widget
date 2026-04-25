@@ -17,6 +17,7 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   useAuiState,
+  useMessage,
   SuggestionPrimitive,
   ThreadPrimitive, useThreadViewportStore,
 } from "@assistant-ui/react";
@@ -387,6 +388,12 @@ const AssistantActionBar: FC = () => {
 };
 
 const UserMessage: FC = () => {
+  const isContinueSignal = useMessage((m) => {
+    if (m.content.length !== 1) return false;
+    const part = m.content[0];
+    return part.type === "text" && part.text.trim() === "<continue/>";
+  });
+  if (isContinueSignal) return null;
   return (
     <MessagePrimitive.Root
       className="aui-user-message-root fade-in slide-in-from-bottom-1 mx-auto grid w-full max-w-(--thread-max-width) animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 px-2 py-3 duration-150 [&:where(>*)]:col-start-2"
