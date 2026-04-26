@@ -104,8 +104,9 @@ export async function confirmToolkitConnection(toolkit: string): Promise<Respons
     });
 }
 
-export function probeServer(): Promise<boolean> {
-    return fetch(`${apiBaseUrl}/health`, { method: "GET" })
-        .then((res) => res.ok)
-        .catch(() => false);
+export function probeServerVersion(): Promise<string | null> {
+    return fetch(`${apiBaseUrl}/shmastra/api/version`, { method: "GET" })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => (data && typeof data.version === "string" ? data.version : null))
+        .catch(() => null);
 }

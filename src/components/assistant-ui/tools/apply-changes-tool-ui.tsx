@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { CheckIcon, CircleIcon, XIcon } from "lucide-react";
 
 type ApplyChangesArgs = { notify?: boolean };
-type ApplyChangesResult = { success: true } | { success: false; error: string };
+type ApplyChangesResult = { success: true, version: string } | { success: false; error: string };
 
 function ApplyChangesRender({ args, result }: { args: ApplyChangesArgs; result?: ApplyChangesResult }) {
     const aui = useAui();
@@ -29,7 +29,7 @@ function ApplyChangesRender({ args, result }: { args: ApplyChangesArgs; result?:
     useEffect(() => {
         if (result?.success && !isRunning && wasLive.current && !triggered.current) {
             triggered.current = true;
-            waitForServer();
+            waitForServer(result.version);
         }
     }, [result, isRunning, waitForServer]);
 

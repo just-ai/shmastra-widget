@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect, type ReactNode } from "react";
-import { probeServer } from "@/lib/api";
+import { probeServerVersion } from "@/lib/api";
 
 interface ServerStatusContextValue {
     restarting: boolean;
-    waitForServer: () => void;
+    waitForServer: (expectedVersion?: string) => void;
 }
 
 const ServerStatusContext = createContext<ServerStatusContextValue>({
@@ -15,7 +15,7 @@ export function useServerStatus() {
     return useContext(ServerStatusContext);
 }
 
-const POLL_INTERVAL = 1500;
+const POLL_INTERVAL = 2000;
 const APPLY_DELAY = 10_000;
 
 /**
@@ -54,14 +54,15 @@ export function ServerStatusProvider({ children }: { children: ReactNode }) {
 
     useClickBlocker(restarting);
 
-    const waitForServer = useCallback(() => {
+    const waitForServer = useCallback((expectedVersion?: string) => {
         if (polling.current) return;
         polling.current = true;
         setRestarting(true);
 
         const probe = () => {
-            probeServer().then((ok) => {
-                if (ok) {
+            probeServerVersion().then((version) => {
+                const matched = version != null && (!expectedVersion || version === expectedVersion);
+                if (matched) {
                     polling.current = false;
                     setRestarting(false);
                 } else {
@@ -70,8 +71,11 @@ export function ServerStatusProvider({ children }: { children: ReactNode }) {
             });
         };
 
-        // Wait for file copy + rebuild before polling
-        setTimeout(probe, APPLY_DELAY);
+        if (expectedVersion) {
+            probe();
+        } else {
+            setTimeout(probe, APPLY_DELAY);
+        }
     }, []);
 
     return (
