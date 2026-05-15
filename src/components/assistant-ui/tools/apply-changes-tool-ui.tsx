@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { CheckIcon, CircleIcon, XIcon } from "lucide-react";
 
 type ApplyChangesArgs = { notify?: boolean };
-type ApplyChangesResult = { success: true, version: string } | { success: false; error: string };
+type ApplyChangesResult = { success: true, version: string, bundled: boolean } | { success: false; error: string };
 
 function ApplyChangesRender({ args, result }: { args: ApplyChangesArgs; result?: ApplyChangesResult }) {
     const aui = useAui();
@@ -29,7 +29,9 @@ function ApplyChangesRender({ args, result }: { args: ApplyChangesArgs; result?:
     useEffect(() => {
         if (result?.success && !isRunning && wasLive.current && !triggered.current) {
             triggered.current = true;
-            waitForServer(result.version);
+            if (result.bundled) {
+                waitForServer(result.version);
+            }
         }
     }, [result, isRunning, waitForServer]);
 
@@ -54,8 +56,9 @@ function ApplyChangesRender({ args, result }: { args: ApplyChangesArgs; result?:
 
     // Determine visual phase
     const isError = result && !result.success;
-    const deploying = !result || (result.success && restarting);
-    const done = result?.success && !restarting;
+    const needsRestart = result?.success && result.bundled;
+    const deploying = !result || (needsRestart && restarting);
+    const done = result?.success && (!needsRestart || !restarting);
 
     if (isError) {
         return (
