@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { setApiBaseUrl } from '@/lib/api'
-import { ShadowRootContext } from '@/lib/shadow-root-context'
+import { ShadowRootContext, PortalContainerContext } from '@/lib/shadow-root-context'
 import type { WidgetOptions } from '@/lib/widget-options.tsx'
 
 declare global {
@@ -47,6 +47,16 @@ export function initAssistantWidget(options: AssistantWidgetOptions = {}) {
 
     const shadow = container.attachShadow({ mode: 'open' });
 
+    // Isolate clicks: stop interaction events at the host so the page can't
+    // react to them (e.g., grabbing focus into its own inputs and triggering
+    // Radix's focus-outside detection that dismisses the modal).
+    const stopBubble = (e: Event) => e.stopPropagation();
+    hostEl.addEventListener('click', stopBubble);
+    hostEl.addEventListener('mousedown', stopBubble);
+    hostEl.addEventListener('pointerdown', stopBubble);
+    hostEl.addEventListener('mouseup', stopBubble);
+    hostEl.addEventListener('pointerup', stopBubble);
+
     // Inject bundled CSS into shadow root
     if (window.__assistantWidgetCSS) {
         const style = document.createElement('style');
@@ -79,7 +89,9 @@ export function initAssistantWidget(options: AssistantWidgetOptions = {}) {
     root.render(
         <StrictMode>
             <ShadowRootContext.Provider value={shadow}>
-                <App options={{openOnStart: options.openOnStart}} />
+                <PortalContainerContext.Provider value={mountPoint}>
+                    <App options={{openOnStart: options.openOnStart}} />
+                </PortalContainerContext.Provider>
             </ShadowRootContext.Provider>
         </StrictMode>,
     );

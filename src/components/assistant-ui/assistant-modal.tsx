@@ -24,9 +24,11 @@ export const AssistantModal: FC<{
   const draggingRef = useRef(false);
 
   useEffect(() => {
+    if (!open) return;
+    readyRef.current = false;
     const readyTimer = setTimeout(() => { readyRef.current = true; }, 800);
     return () => { clearTimeout(readyTimer); };
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
