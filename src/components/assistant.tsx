@@ -94,6 +94,7 @@ import {getChatUrl, getThread, type ThreadData} from "@/lib/api";
 import {fileAttachmentAdapter} from "@/lib/file-attachment-adapter";
 import {WebSpeechDictationAdapter} from "@assistant-ui/core";
 import {ModelProvider, useModel} from "@/lib/model-context";
+import {useWidgetOptions} from "@/lib/widget-options.tsx";
 import {AssistantModal} from "@/components/assistant-ui/assistant-modal.tsx";
 import {ThreadResetter} from "@/components/thread-resetter.tsx";
 import {ThemeWrapper} from "@/components/theme-wrapper.tsx";
@@ -103,6 +104,7 @@ function AssistantChat({threadData, setThreadData}: {
     setThreadData: (data: ThreadData) => void;
 }) {
     const {modelId} = useModel();
+    const {openOnStart} = useWidgetOptions();
     const [modalOpen, setModalOpen] = useState(false);
     const runtime = useChatRuntime({
         messages: threadData.messages,
@@ -131,6 +133,7 @@ function AssistantChat({threadData, setThreadData}: {
     });
 
     useEffect(() => {
+        if (!openOnStart) return;
         setTimeout(() => setModalOpen(true), 300);
     }, []);
 

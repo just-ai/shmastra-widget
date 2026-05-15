@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { setApiBaseUrl } from '@/lib/api'
 import { ShadowRootContext } from '@/lib/shadow-root-context'
+import type { WidgetOptions } from '@/lib/widget-options.tsx'
 
 declare global {
     interface Window {
@@ -11,7 +12,7 @@ declare global {
     }
 }
 
-export interface AssistantWidgetOptions {
+export interface AssistantWidgetOptions extends Partial<WidgetOptions> {
     element?: HTMLElement | string;
     apiBaseUrl?: string;
     theme?: 'light' | 'dark' | 'system';
@@ -78,7 +79,7 @@ export function initAssistantWidget(options: AssistantWidgetOptions = {}) {
     root.render(
         <StrictMode>
             <ShadowRootContext.Provider value={shadow}>
-                <App />
+                <App options={{openOnStart: options.openOnStart}} />
             </ShadowRootContext.Provider>
         </StrictMode>,
     );
@@ -96,6 +97,9 @@ if (typeof document !== 'undefined') {
             element: autoContainer,
             apiBaseUrl: autoContainer.dataset.apiBaseUrl,
             theme: (autoContainer.dataset.theme as AssistantWidgetOptions['theme']) || undefined,
+            openOnStart: autoContainer.dataset.openOnStart === undefined
+                ? undefined
+                : autoContainer.dataset.openOnStart !== 'false',
         });
     }
 }
