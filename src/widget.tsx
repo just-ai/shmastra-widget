@@ -50,12 +50,12 @@ export function initAssistantWidget(options: AssistantWidgetOptions = {}) {
     // Isolate clicks: stop interaction events at the host so the page can't
     // react to them (e.g., grabbing focus into its own inputs and triggering
     // Radix's focus-outside detection that dismisses the modal).
+    // NOTE: do NOT stop mouseup/pointerup — drag handlers (e.g., the resize
+    // handle) attach those to document and would never release.
     const stopBubble = (e: Event) => e.stopPropagation();
     hostEl.addEventListener('click', stopBubble);
     hostEl.addEventListener('mousedown', stopBubble);
     hostEl.addEventListener('pointerdown', stopBubble);
-    hostEl.addEventListener('mouseup', stopBubble);
-    hostEl.addEventListener('pointerup', stopBubble);
 
     // Inject bundled CSS into shadow root
     if (window.__assistantWidgetCSS) {
