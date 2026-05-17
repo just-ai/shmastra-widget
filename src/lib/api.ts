@@ -18,6 +18,11 @@ export function getChatUrl(): string {
     return `${apiBaseUrl}/shmastra/api/chat`;
 }
 
+export function getFilesUrl(fileName?: string): string {
+    const base = `${apiBaseUrl}/shmastra/api/files`;
+    return fileName ? `${base}/${fileName}` : base;
+}
+
 let threadPromise: Promise<ThreadData> | null = null;
 
 export function getThread(): Promise<ThreadData> {

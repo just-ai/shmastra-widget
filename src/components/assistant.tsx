@@ -106,16 +106,22 @@ function AssistantChat({threadData, setThreadData}: {
     const {modelId} = useModel();
     const {openOnStart} = useWidgetOptions();
     const [modalOpen, setModalOpen] = useState(false);
+
+    // Read latest threadId/modelId at request time so a thread reset takes
+    // effect on the next chat POST even if the transport instance is stale.
+    const bodyRef = useRef({modelId, threadId: threadData.threadId});
+    bodyRef.current = {modelId, threadId: threadData.threadId};
+
     const runtime = useChatRuntime({
         messages: threadData.messages,
         transport: new AssistantChatTransport({
             api: getChatUrl(),
-            body: {
-                modelId,
-                threadId: threadData.threadId,
+            body: () => ({
+                modelId: bodyRef.current.modelId,
+                threadId: bodyRef.current.threadId,
                 path: window.location.pathname,
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            },
+            }),
         }),
         adapters: {
             attachments: fileAttachmentAdapter,
